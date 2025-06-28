@@ -5,14 +5,38 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DOMPurify from "dompurify";
 
 export default function NewTemplatePage() {
   const [title, setTitle] = useState("");
   const [htmlContent, setHtmlContent] = useState(
-    "<h1>Template Preview</h1><p>Your contract preview will appear here when you paste or upload HTML content.</p>"
+    `<h1>Sample Contract Template</h1>
+<h2>Agreement Details</h2>
+<p>This is a <strong>sample contract template</strong> that demonstrates how HTML content will be rendered in the preview.</p>
+<h3>Terms and Conditions</h3>
+<ul>
+  <li>First term of the agreement</li>
+  <li>Second term with <em>emphasis</em></li>
+  <li>Third term with important details</li>
+</ul>
+<h3>Parties Involved</h3>
+<p>This agreement is between:</p>
+<ol>
+  <li><strong>Party A:</strong> [Originator Name]</li>
+  <li><strong>Party B:</strong> [Responder Name]</li>
+</ol>
+<h3>Signature Section</h3>
+<p>By signing below, both parties agree to the terms outlined in this contract.</p>
+<div style="margin-top: 40px;">
+  <p><strong>Originator Signature:</strong> _________________________</p>
+  <p><strong>Date:</strong> _________________________</p>
+</div>
+<div style="margin-top: 20px;">
+  <p><strong>Responder Signature:</strong> _________________________</p>
+  <p><strong>Date:</strong> _________________________</p>
+</div>`
   );
 
   // Handles reading the content of a selected .html file
@@ -45,8 +69,21 @@ export default function NewTemplatePage() {
     alert("Template saved! Check your browser's developer console for the output.");
   };
 
-  // CRITICAL: Sanitize the HTML before rendering it in the preview to prevent XSS attacks
-  const sanitizedHtml = DOMPurify.sanitize(htmlContent);
+  // Configure DOMPurify to allow more HTML elements and attributes for contract templates
+  const sanitizedHtml = DOMPurify.sanitize(htmlContent, {
+    ALLOWED_TAGS: [
+      'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+      'p', 'br', 'hr',
+      'strong', 'b', 'em', 'i', 'u', 's', 'mark',
+      'ul', 'ol', 'li',
+      'div', 'span',
+      'table', 'thead', 'tbody', 'tr', 'th', 'td',
+      'blockquote',
+      'a'
+    ],
+    ALLOWED_ATTR: ['style', 'class', 'href', 'target', 'rel'],
+    ALLOW_DATA_ATTR: false
+  });
 
   return (
     <div className="container mx-auto py-10">
@@ -105,16 +142,151 @@ export default function NewTemplatePage() {
         {/* === RIGHT COLUMN: PREVIEW === */}
         <div className="space-y-2">
           <Label className="text-lg font-semibold">Live Preview</Label>
-          <Card className="h-full min-h-[400px] overflow-auto">
-            <CardContent className="p-6 prose prose-lg">
+          <Card className="h-full min-h-[400px]">
+            <CardHeader>
+              <CardTitle className="text-sm text-muted-foreground">Template Preview</CardTitle>
+            </CardHeader>
+            <CardContent className="overflow-auto max-h-[600px]">
               <div
-                // This is safe to use BECAUSE we are passing the `sanitizedHtml` variable
+                className="contract-preview"
+                style={{
+                  fontFamily: 'system-ui, -apple-system, sans-serif',
+                  lineHeight: '1.6',
+                  color: '#1f2937'
+                }}
                 dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
               />
             </CardContent>
           </Card>
         </div>
       </div>
+
+      <style jsx>{`
+        .contract-preview h1 {
+          font-size: 2rem;
+          font-weight: 700;
+          margin: 1.5rem 0 1rem 0;
+          color: #111827;
+          border-bottom: 2px solid #e5e7eb;
+          padding-bottom: 0.5rem;
+        }
+        
+        .contract-preview h2 {
+          font-size: 1.5rem;
+          font-weight: 600;
+          margin: 1.25rem 0 0.75rem 0;
+          color: #1f2937;
+        }
+        
+        .contract-preview h3 {
+          font-size: 1.25rem;
+          font-weight: 600;
+          margin: 1rem 0 0.5rem 0;
+          color: #374151;
+        }
+        
+        .contract-preview h4 {
+          font-size: 1.125rem;
+          font-weight: 600;
+          margin: 0.875rem 0 0.5rem 0;
+          color: #374151;
+        }
+        
+        .contract-preview h5 {
+          font-size: 1rem;
+          font-weight: 600;
+          margin: 0.75rem 0 0.5rem 0;
+          color: #4b5563;
+        }
+        
+        .contract-preview h6 {
+          font-size: 0.875rem;
+          font-weight: 600;
+          margin: 0.75rem 0 0.5rem 0;
+          color: #4b5563;
+        }
+        
+        .contract-preview p {
+          margin: 0.75rem 0;
+          line-height: 1.7;
+        }
+        
+        .contract-preview ul, .contract-preview ol {
+          margin: 0.75rem 0;
+          padding-left: 1.5rem;
+        }
+        
+        .contract-preview li {
+          margin: 0.25rem 0;
+        }
+        
+        .contract-preview strong, .contract-preview b {
+          font-weight: 600;
+          color: #111827;
+        }
+        
+        .contract-preview em, .contract-preview i {
+          font-style: italic;
+        }
+        
+        .contract-preview u {
+          text-decoration: underline;
+        }
+        
+        .contract-preview s {
+          text-decoration: line-through;
+        }
+        
+        .contract-preview mark {
+          background-color: #fef3c7;
+          padding: 0.125rem 0.25rem;
+          border-radius: 0.25rem;
+        }
+        
+        .contract-preview blockquote {
+          border-left: 4px solid #d1d5db;
+          padding-left: 1rem;
+          margin: 1rem 0;
+          font-style: italic;
+          color: #6b7280;
+        }
+        
+        .contract-preview hr {
+          border: none;
+          border-top: 1px solid #e5e7eb;
+          margin: 1.5rem 0;
+        }
+        
+        .contract-preview table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 1rem 0;
+        }
+        
+        .contract-preview th, .contract-preview td {
+          border: 1px solid #d1d5db;
+          padding: 0.5rem;
+          text-align: left;
+        }
+        
+        .contract-preview th {
+          background-color: #f9fafb;
+          font-weight: 600;
+        }
+        
+        .contract-preview a {
+          color: #2563eb;
+          text-decoration: underline;
+        }
+        
+        .contract-preview a:hover {
+          color: #1d4ed8;
+        }
+        
+        .contract-preview div {
+          margin: 0.5rem 0;
+        }
+      `}</style>
     </div>
   );
 }
