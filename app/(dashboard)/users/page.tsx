@@ -1,11 +1,18 @@
 import { columns, User } from "./columns";
 import { DataTable } from "@/components/dashboard/DataTable";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050/api";
+
 async function getUsers(): Promise<User[]> {
-  return [
-    { id: "USR-001", name: "Alice Johnson", email: "alice@example.com", role: "RESPONDER" },
-    { id: "USR-002", name: "Innovate Inc.", email: "contact@innovate.com", role: "ORIGINATOR" },
-  ];
+  const res = await fetch(`${API_URL}/users`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch users");
+  const users = await res.json();
+  // Map backend user fields to table fields
+  return users.map((u: { name: string; email: string; role: string }) => ({
+    name: u.name,
+    email: u.email,
+    role: u.role?.toUpperCase() || "USER",
+  }));
 }
 
 export default async function UserManagementPage() {

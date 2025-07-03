@@ -16,14 +16,14 @@ import {
 
 // Define the shape of our User data
 export type User = {
-  id: string;
+  // id: string; // Remove ID
   name: string;
   email: string;
   role: "ORIGINATOR" | "RESPONDER";
 };
 
 export const columns: ColumnDef<User>[] = [
-  { accessorKey: "id", header: "User ID" },
+  // { accessorKey: "id", header: "User ID" }, // Remove ID column
   { accessorKey: "name", header: "Name" },
   { accessorKey: "email", header: "Email" },
   {
@@ -38,7 +38,7 @@ export const columns: ColumnDef<User>[] = [
 
       const handleSuspend = () => {
         // Placeholder for backend logic
-        console.log(`Suspending user: ${user.id}`);
+        console.log(`Suspending user: ${user.name}`);
         alert(`Suspending user: ${user.name}`);
       };
 
@@ -46,7 +46,7 @@ export const columns: ColumnDef<User>[] = [
         // Add a confirmation dialog for destructive actions
         if (window.confirm(`Are you sure you want to delete user: ${user.name}?`)) {
           // Placeholder for backend logic
-          console.log(`Deleting user: ${user.id}`);
+          console.log(`Deleting user: ${user.name}`);
           alert(`Deleting user: ${user.name}`);
         }
       };

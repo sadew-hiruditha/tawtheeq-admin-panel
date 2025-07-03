@@ -1,11 +1,20 @@
 import { columns, Auditor } from "./columns";
 import { DataTable } from "@/components/dashboard/DataTable";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050/api";
+
 async function getAuditors(): Promise<Auditor[]> {
-  return [
-    { id: "AUD-001", name: "Admin Auditor", email: "auditor@tawtheeq.com", status: "Active" },
-    { id: "AUD-002", name: "External Reviewer", email: "reviewer@auditfirm.com", status: "Inactive" },
-  ];
+  const res = await fetch(`${API_URL}/users`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch auditors");
+  const users = await res.json();
+  // Filter users with role 'lawyer' and map to Auditor type
+  return users
+    .filter((u: { role: string }) => u.role === "lawyer")
+    .map((u: { name: string; email: string; role: string }) => ({
+      name: u.name,
+      email: u.email,
+      status: "Active", // You can adjust this logic if you have a real status field
+    }));
 }
 
 export default async function AuditorManagementPage() {

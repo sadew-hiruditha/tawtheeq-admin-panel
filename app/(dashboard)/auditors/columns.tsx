@@ -16,14 +16,12 @@ import {
 
 
 export type Auditor = {
-  id: string;
   name: string;
   email: string;
   status: "Active" | "Inactive";
 };
 
 export const columns: ColumnDef<Auditor>[] = [
-  { accessorKey: "id", header: "Auditor ID" },
   { accessorKey: "name", header: "Name" },
   { accessorKey: "email", header: "Email" },
   {
@@ -40,13 +38,13 @@ export const columns: ColumnDef<Auditor>[] = [
       const auditor = row.original;
 
       const handleSuspend = () => {
-        console.log(`Suspending auditor: ${auditor.id}`);
+        console.log(`Suspending auditor: ${auditor.name}`);
         alert(`Suspending auditor: ${auditor.name}`);
       };
 
       const handleDelete = () => {
         if (window.confirm(`Are you sure you want to delete auditor: ${auditor.name}?`)) {
-          console.log(`Deleting auditor: ${auditor.id}`);
+          console.log(`Deleting auditor: ${auditor.name}`);
           alert(`Deleting auditor: ${auditor.name}`);
         }
       };
