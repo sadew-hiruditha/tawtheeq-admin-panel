@@ -32,7 +32,7 @@ export const createColumns = (): ColumnDef<Auditor>[] => [
       return (
         <Link
           href={`/auditors/${auditor.id}`}
-          className="text-blue-600 hover:underline"
+          className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
         >
           {auditor.name}
         </Link>

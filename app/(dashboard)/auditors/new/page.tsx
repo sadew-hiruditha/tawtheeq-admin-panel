@@ -150,7 +150,7 @@ export default function CreateAuditorPage() {
         <div>
           <h1 className="text-3xl font-bold">Create New Auditor</h1>
           <p className="text-gray-600 mt-1">
-            Enter the auditor&apos;s professional details. Submitting will send the data to the live API.
+            Enter the auditor&apos;s professional details.
           </p>
         </div>
         <div className="flex gap-3">
