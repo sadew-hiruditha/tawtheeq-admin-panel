@@ -18,15 +18,56 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     async function fetchStats() {
       try {
-        const response = await apiClient.getDashboardStats();
-        if (response.success && response.data) {
-          setStats(response.data);
-        } else {
-          setError(response.error || "Failed to fetch dashboard stats");
+        const [statsResponse, auditorsResponse] = await Promise.all([
+          apiClient.getDashboardStats(),
+          apiClient.getAuditors(),
+        ]);
+
+        let nextStats: DashboardStats = {
+          totalUsers:
+            statsResponse.success && statsResponse.data
+              ? statsResponse.data.totalUsers
+              : 0,
+          totalContracts:
+            statsResponse.success && statsResponse.data
+              ? statsResponse.data.totalContracts
+              : 0,
+          activeAuditors:
+            statsResponse.success && statsResponse.data
+              ? statsResponse.data.activeAuditors
+              : 0,
+          pendingReviews:
+            statsResponse.success && statsResponse.data
+              ? statsResponse.data.pendingReviews
+              : 0,
+        };
+
+        if (auditorsResponse.success && auditorsResponse.data) {
+          nextStats = {
+            ...nextStats,
+            activeAuditors: auditorsResponse.data.length,
+          };
         }
+
+        setStats(nextStats);
+
+        let combinedError = "";
+
+        if (!statsResponse.success) {
+          combinedError = statsResponse.error || "Failed to fetch dashboard stats";
+        }
+
+        if (!auditorsResponse.success) {
+          const auditorError = auditorsResponse.error || "Failed to fetch auditors";
+          combinedError = combinedError
+            ? `${combinedError}. ${auditorError}`
+            : auditorError;
+        }
+
+        setError(combinedError);
       } catch (err) {
-        setError("Could not connect to the API server");
         console.error("Dashboard stats error:", err);
+        setError("Could not connect to the API server");
       } finally {
         setLoading(false);
       }

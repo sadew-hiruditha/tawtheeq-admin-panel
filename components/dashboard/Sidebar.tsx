@@ -9,6 +9,7 @@ import {
   Users,
   Shield, // A great icon for Auditors
   LogOut,
+  PlusCircle,
 } from "lucide-react";
 
 const Sidebar = () => {
@@ -17,9 +18,10 @@ const Sidebar = () => {
   // Navigation links tailored for the Admin Panel
   const navLinks = [
     { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-    { href: "/contracts", icon: FileText, label: "Contracts" },
+    // { href: "/contracts", icon: FileText, label: "Contracts" },
     { href: "/users", icon: Users, label: "User Management" },
     { href: "/auditors", icon: Shield, label: "Auditor Management" },
+    { href: "/auditors/new", icon: PlusCircle, label: "Create Auditor" },
     // { href: "/templates", icon: BookText, label: "Templates" },
   ];
 
