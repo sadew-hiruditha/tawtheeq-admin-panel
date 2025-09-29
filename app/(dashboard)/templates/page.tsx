@@ -2,13 +2,29 @@ import { columns, Template } from "./columns";
 import { DataTable } from "@/components/dashboard/DataTable";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import apiClient from "@/lib/api";
 
-// Mock data function
+// Updated function to use API client
 async function getTemplates(): Promise<Template[]> {
-  return [
-    { id: "TMPL-001", title: "Standard Freelance Agreement", createdAt: "2024-05-10" },
-    { id: "TMPL-002", title: "Non-Disclosure Agreement (NDA)", createdAt: "2024-04-22" },
-  ];
+  try {
+    const response = await apiClient.getTemplates();
+    if (!response.success || !response.data) {
+      throw new Error(response.error || "Failed to fetch templates");
+    }
+
+    return response.data.map((template) => ({
+      id: template.id,
+      title: template.name,
+      createdAt: template.createdAt,
+    }));
+  } catch (error) {
+    console.error("Error fetching templates:", error);
+    // Return mock data for development
+    return [
+      { id: "TMPL-001", title: "Standard Freelance Agreement", createdAt: "2024-05-10" },
+      { id: "TMPL-002", title: "Non-Disclosure Agreement (NDA)", createdAt: "2024-04-22" },
+    ];
+  }
 }
 
 export default async function ManageTemplatesPage() {
@@ -22,7 +38,13 @@ export default async function ManageTemplatesPage() {
           <Link href="/templates/new">Add New Template</Link>
         </Button>
       </div>
-      <DataTable columns={columns} data={data} filterColumn="title" />
+      {data.length === 0 ? (
+        <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-md">
+          <p>No templates found. Make sure the API server is running at http://localhost:6060/api</p>
+        </div>
+      ) : (
+        <DataTable columns={columns} data={data} filterColumn="title" />
+      )}
     </div>
   );
 }

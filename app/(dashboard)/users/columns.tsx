@@ -5,6 +5,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,15 +17,28 @@ import {
 
 // Define the shape of our User data
 export type User = {
-  // id: string; // Remove ID
+  id: string; // Add ID back for navigation
   name: string;
   email: string;
-  role: "ORIGINATOR" | "RESPONDER";
+  role: string; // Changed from union type to string for flexibility
 };
 
 export const columns: ColumnDef<User>[] = [
-  // { accessorKey: "id", header: "User ID" }, // Remove ID column
-  { accessorKey: "name", header: "Name" },
+  {
+    accessorKey: "name",
+    header: "Name",
+    cell: ({ row }) => {
+      const user = row.original;
+      return (
+        <Link 
+          href={`/users/${user.id}`}
+          className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
+        >
+          {user.name}
+        </Link>
+      );
+    },
+  },
   { accessorKey: "email", header: "Email" },
   {
     accessorKey: "role",
@@ -61,8 +75,10 @@ export const columns: ColumnDef<User>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => alert(`Viewing details for ${user.name}`)}>
-              View User Details
+            <DropdownMenuItem asChild>
+              <Link href={`/users/${user.id}`}>
+                View User Details
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleSuspend}>

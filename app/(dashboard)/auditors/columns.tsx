@@ -13,16 +13,32 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Link from "next/link";
 
 
 export type Auditor = {
+  id: string;
   name: string;
   email: string;
-  status: "Active" | "Inactive";
+  status: string; // Changed from union type to string for flexibility
 };
 
-export const columns: ColumnDef<Auditor>[] = [
-  { accessorKey: "name", header: "Name" },
+export const createColumns = (): ColumnDef<Auditor>[] => [
+  {
+    accessorKey: "name",
+    header: "Name",
+    cell: ({ row }) => {
+      const auditor = row.original;
+      return (
+        <Link
+          href={`/auditors/${auditor.id}`}
+          className="text-blue-600 hover:underline"
+        >
+          {auditor.name}
+        </Link>
+      );
+    },
+  },
   { accessorKey: "email", header: "Email" },
   {
     accessorKey: "status",
@@ -36,6 +52,10 @@ export const columns: ColumnDef<Auditor>[] = [
     id: "actions",
     cell: ({ row }) => {
       const auditor = row.original;
+
+      const handleViewDetails = () => {
+        window.location.href = `/auditors/${auditor.id}`;
+      };
 
       const handleSuspend = () => {
         console.log(`Suspending auditor: ${auditor.name}`);
@@ -59,7 +79,7 @@ export const columns: ColumnDef<Auditor>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => alert(`Viewing details for ${auditor.name}`)}>
+            <DropdownMenuItem onClick={handleViewDetails}>
               View Auditor Details
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -78,3 +98,5 @@ export const columns: ColumnDef<Auditor>[] = [
     },
   },
 ];
+
+export const columns = createColumns();

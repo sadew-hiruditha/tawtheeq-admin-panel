@@ -3,11 +3,10 @@
 import { AnalyticsCard } from "@/components/dashboard/AnalyticsCard";
 import { Users, FileText, Shield, Hourglass } from "lucide-react";
 import { useEffect, useState } from "react";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050/api";
+import apiClient, { DashboardStats } from "@/lib/api";
 
 export default function AdminDashboardPage() {
-  const [stats, setStats] = useState({
+  const [stats, setStats] = useState<DashboardStats>({
     totalUsers: 0,
     totalContracts: 0,
     activeAuditors: 0,
@@ -19,12 +18,15 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     async function fetchStats() {
       try {
-        const res = await fetch(`${API_URL}/stats`);
-        if (!res.ok) throw new Error("Failed to fetch stats");
-        const data = await res.json();
-        setStats(data);
-      } catch {
-        setError("Could not load dashboard stats");
+        const response = await apiClient.getDashboardStats();
+        if (response.success && response.data) {
+          setStats(response.data);
+        } else {
+          setError(response.error || "Failed to fetch dashboard stats");
+        }
+      } catch (err) {
+        setError("Could not connect to the API server");
+        console.error("Dashboard stats error:", err);
       } finally {
         setLoading(false);
       }
@@ -69,8 +71,11 @@ export default function AdminDashboardPage() {
           A high-level overview of the Tawtheeq platform.
         </p>
       </div>
+      
       {error && (
-        <div className="text-red-500 font-semibold">{error}</div>
+        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">
+          <strong>Error:</strong> {error}
+        </div>
       )}
       {/* Responsive Grid for Analytics Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

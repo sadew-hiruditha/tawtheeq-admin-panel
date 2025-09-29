@@ -9,7 +9,6 @@ import {
   Users,
   Shield, // A great icon for Auditors
   LogOut,
-  BookText,
 } from "lucide-react";
 
 const Sidebar = () => {
@@ -21,7 +20,7 @@ const Sidebar = () => {
     { href: "/contracts", icon: FileText, label: "Contracts" },
     { href: "/users", icon: Users, label: "User Management" },
     { href: "/auditors", icon: Shield, label: "Auditor Management" },
-    { href: "/templates", icon: BookText, label: "Templates" },
+    // { href: "/templates", icon: BookText, label: "Templates" },
   ];
 
   return (

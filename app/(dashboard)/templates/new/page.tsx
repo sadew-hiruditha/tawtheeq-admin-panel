@@ -12,7 +12,7 @@ import DOMPurify from "dompurify";
 export default function NewTemplatePage() {
   const [title, setTitle] = useState("");
   const [htmlContent, setHtmlContent] = useState(
-    "<h1>Template Preview</h1><p>Your contract preview will appear here when you paste or upload HTML content.</p>"
+    "<b>Template Preview</b></br><p>Your contract preview will appear here when you paste or <span style='color: red;'>upload HTML content.</span></p>"
   );
 
   // Handles reading the content of a selected .html file

@@ -18,17 +18,18 @@ import {
 export type Contract = {
   id: string;
   title: string;
-  status: "Completed" | "Pending" | "Disputed" | "Draft";
+  status: string; // Changed from union type to string for flexibility
   originator: string;
   responder: string;
   createdAt: string;
 };
 
-const getStatusBadgeVariant = (status: Contract["status"]) => {
-  switch (status) {
-    case "Completed": return "default";
-    case "Pending": return "secondary";
-    case "Disputed": return "destructive";
+const getStatusBadgeVariant = (status: string) => {
+  switch (status.toLowerCase()) {
+    case "completed": return "default";
+    case "pending": return "secondary";
+    case "disputed": return "destructive";
+    case "draft": return "outline";
     default: return "outline";
   }
 };

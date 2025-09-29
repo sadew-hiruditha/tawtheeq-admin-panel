@@ -37,7 +37,6 @@ export function DataTable<TData, TValue>({
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    onColumnFiltersChange: (updater) => {},
     onGlobalFilterChange: setFiltering,
     state: {
       globalFilter: filtering,
