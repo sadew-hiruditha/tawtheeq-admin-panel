@@ -2,13 +2,13 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:6060/api",
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || "https://tawtheeq-auditor-admin-79bf6673faeb.herokuapp.com/api",
   },
   async rewrites() {
     return [
       {
         source: '/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:6060/api"}/:path*`,
+        destination: `${process.env.NEXT_PUBLIC_API_URL || "https://tawtheeq-auditor-admin-79bf6673faeb.herokuapp.com/api"}/:path*`,
       },
     ];
   },

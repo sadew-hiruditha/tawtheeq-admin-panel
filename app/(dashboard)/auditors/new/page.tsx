@@ -50,6 +50,7 @@ export default function CreateAuditorPage() {
   const [formData, setFormData] = useState<AuditorFormState>(INITIAL_FORM);
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [credentials, setCredentials] = useState<{ username: string; password: string } | null>(null);
 
   const handleChange = (field: keyof AuditorFormState) => (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -90,6 +91,7 @@ export default function CreateAuditorPage() {
       try {
         setSubmitting(true);
         setStatus(null);
+        setCredentials(null);
         const response = await fetch(endpoint, {
           method: "POST",
           headers: {
@@ -98,22 +100,32 @@ export default function CreateAuditorPage() {
           body: JSON.stringify(payload),
         });
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          let userMessage = "Failed to create auditor";
-          
+        const responseText = await response.text();
+        let responseData: unknown = null;
+
+        if (responseText) {
           try {
-            const errorData = JSON.parse(errorText);
-            if (errorData.message === "Email already exists") {
-              userMessage = "An auditor with this email already exists. Please use a different email.";
-            } else if (errorData.error && errorData.error.includes("email already exists")) {
-              userMessage = "An auditor with this email already exists. Please use a different email.";
-            } else if (errorData.message) {
-              userMessage = errorData.message;
-            }
+            responseData = JSON.parse(responseText);
           } catch {
+            // Non-JSON response, keep as null for now
+          }
+        }
+
+        if (!response.ok) {
+          let userMessage = "Failed to create auditor";
+          const errorData = responseData as
+            | { message?: string; error?: string }
+            | null;
+          
+          if (errorData?.message === "Email already exists") {
+            userMessage = "An auditor with this email already exists. Please use a different email.";
+          } else if (errorData?.error && errorData.error.includes("email already exists")) {
+            userMessage = "An auditor with this email already exists. Please use a different email.";
+          } else if (errorData?.message) {
+            userMessage = errorData.message;
+          } else if (responseText) {
             // If it's not JSON, use the raw text but make it more user-friendly
-            if (errorText.toLowerCase().includes("email")) {
+            if (responseText.toLowerCase().includes("email")) {
               userMessage = "There was an issue with the email address. Please check and try again.";
             }
           }
@@ -121,7 +133,26 @@ export default function CreateAuditorPage() {
           throw new Error(userMessage);
         }
 
-        setStatus({ type: "success", message: "Auditor created successfully." });
+        const successData = responseData as
+          | {
+              data?: {
+                email?: string;
+                generated_password?: string;
+              };
+            }
+          | null;
+
+        const username = successData?.data?.email ?? payload.email ?? "";
+        const password = successData?.data?.generated_password ?? "";
+
+        if (username || password) {
+          setCredentials({ username, password });
+        }
+
+        setStatus({
+          type: "success",
+          message: "Auditor created successfully. Share the temporary credentials below.",
+        });
         setFormData(INITIAL_FORM);
         // Scroll to bottom to show success message
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
@@ -129,6 +160,7 @@ export default function CreateAuditorPage() {
         console.error("Auditor creation failed", error);
         const message = error instanceof Error ? error.message : "Failed to create auditor";
         setStatus({ type: "error", message });
+        setCredentials(null);
         // Scroll to bottom to show error message
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
       } finally {
@@ -142,6 +174,7 @@ export default function CreateAuditorPage() {
   const handleReset = () => {
     setFormData(INITIAL_FORM);
     setStatus(null);
+    setCredentials(null);
   };
 
   return (
@@ -373,7 +406,7 @@ export default function CreateAuditorPage() {
       {/* Status message placed at the bottom where users can see it */}
       {status && (
         <div
-          className={`border rounded-md px-4 py-3 flex items-center gap-3 ${
+          className={`border rounded-md px-4 py-3 flex items-start gap-3 ${
             status.type === "success"
               ? "border-green-200 bg-green-50 text-green-700"
               : "border-red-200 bg-red-50 text-red-700"
@@ -382,7 +415,24 @@ export default function CreateAuditorPage() {
           <Badge variant={status.type === "success" ? "default" : "outline"}>
             {status.type === "success" ? "Success" : "Notice"}
           </Badge>
-          <span>{status.message}</span>
+          <div className="flex flex-col gap-2">
+            <span>{status.message}</span>
+            {status.type === "success" && credentials && (
+              <div className="rounded-md bg-white/70 p-3 text-sm text-gray-700 shadow-sm">
+                <p>
+                  <span className="font-semibold text-gray-900">Username:</span>{" "}
+                  <span className="break-all text-gray-800">{credentials.username}</span>
+                </p>
+                <p className="mt-1">
+                  <span className="font-semibold text-gray-900">Temporary password:</span>{" "}
+                  <span className="break-all text-gray-800">{credentials.password || "Not provided"}</span>
+                </p>
+                <p className="mt-2 text-xs text-gray-500">
+                  Share these credentials securely. The user will be prompted to change the password on first login.
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

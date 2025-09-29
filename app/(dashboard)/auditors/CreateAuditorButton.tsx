@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-const ENDPOINT = "https://tawtheeq-app-de43b24218ea.herokuapp.com/api/auditors";
+const ENDPOINT = `${process.env.NEXT_PUBLIC_API_URL || "https://tawtheeq-auditor-admin-79bf6673faeb.herokuapp.com/api"}/auditors`;
 
 const SAMPLE_PAYLOAD = {
   name: "Dr. Sofia Johnson",

@@ -1,5 +1,5 @@
 // API client for Tawtheeq Admin Panel
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:6060/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://tawtheeq-auditor-admin-79bf6673faeb.herokuapp.com/api";
 
 // Types for API responses
 export interface ApiResponse<T> {
